@@ -1,6 +1,5 @@
 import bcrypt from 'bcryptjs';
-import User from '../../models/User.js';
-import Organization from '../../models/Organization.js';
+import supabase from '../../db/supabase.js';
 
 class AuthController {
   async register(req, res) {
@@ -30,15 +29,25 @@ class AuthController {
       }
 
       // Check if organization exists
-      const organization = await Organization.findById(organizationId);
-      if (!organization) {
+      const { data: organization, error: orgError } = await supabase
+        .from('organizations')
+        .select('id')
+        .eq('id', organizationId)
+        .single();
+
+      if (orgError || !organization) {
         return res.status(404).json({ 
           error: 'Organization not found' 
         });
       }
 
       // Check if user already exists
-      const existingUser = await User.findOne({ email });
+      const { data: existingUser, error: userError } = await supabase
+        .from('users')
+        .select('email')
+        .eq('email', email)
+        .single();
+
       if (existingUser) {
         return res.status(400).json({ 
           error: 'Email already registered' 
@@ -50,29 +59,42 @@ class AuthController {
       const hashedPassword = await bcrypt.hash(password, salt);
 
       // Create new user
-      const user = new User({
-        email,
-        password: hashedPassword,
-        firstName,
-        lastName,
-        organization: organizationId,
-        role: 'operator'
-      });
+      const { data: user, error: createError } = await supabase
+        .from('users')
+        .insert([
+          {
+            email,
+            password: hashedPassword,
+            first_name: firstName,
+            last_name: lastName,
+            organizationId,
+            role: 'operator',
+            status: 'active',
+            preferences: {
+              notifications: {
+                email: true,
+                push: true
+              },
+              dashboard_layout: {}
+            }
+          }
+        ])
+        .select()
+        .single();
 
-      await user.save();
+      if (createError) throw createError;
 
-      // Return user without password
-      const userResponse = user.toObject();
-      delete userResponse.password;
+      // Remove password from response
+      delete user.password;
 
       res.status(201).json({
         message: 'User registered successfully',
-        user: userResponse
+        user
       });
     } catch (error) {
       console.error('Registration error:', error);
       res.status(500).json({ 
-        error: 'Internal server error' 
+        error: error.message || 'Internal server error' 
       });
     }
   }

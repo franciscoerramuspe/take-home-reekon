@@ -1,0 +1,21 @@
+meta {
+  name: Register User
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:3000/api/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "francisco@reekon.com",
+    "password": "securepassword123",
+    "firstName": "Francisc",
+    "lastName": "Erramuspe",
+    "organizationId": "9c147b50-f35f-443d-ad83-c10fee7645ec"
+  }
+}
