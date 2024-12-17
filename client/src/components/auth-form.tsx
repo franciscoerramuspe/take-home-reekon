@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import { Loader2 } from 'lucide-react'
 
 interface AuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string
@@ -67,7 +68,7 @@ export function AuthInput({ label, ...props }: { label: string } & React.Compone
   )
 }
 
-export function AuthButton(props: React.ComponentProps<typeof Button>) {
+export function AuthButton({ children, isLoading, ...props }: React.ComponentProps<typeof Button> & { isLoading?: boolean }) {
   return (
     <Button 
       {...props} 
@@ -76,7 +77,17 @@ export function AuthButton(props: React.ComponentProps<typeof Button>) {
         "transition-all duration-200",
         props.className
       )}
-    />
+      disabled={isLoading}
+    >
+      {isLoading ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Please wait
+        </>
+      ) : (
+        children
+      )}
+    </Button>
   )
 }
 
@@ -91,3 +102,4 @@ export function AuthLink(props: React.ComponentProps<"a">) {
     />
   )
 }
+

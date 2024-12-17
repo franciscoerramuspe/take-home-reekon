@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Logo } from "@/components/logo"
+import { AuthForm, AuthInput, AuthButton, AuthLink } from "@/components/auth-form"
 
 export default function SignUp() {
   const router = useRouter()
@@ -16,13 +17,16 @@ export default function SignUp() {
     organizationId: '9c147b50-f35f-443d-ad83-c10fee7645ec'
   })
   const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setIsLoading(true)
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match')
+      setIsLoading(false)
       return
     }
 
@@ -45,84 +49,78 @@ export default function SignUp() {
       router.push('/dashboard')
     } catch (err: any) {
       setError(err.message || 'Something went wrong')
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-background">
-      <div className="bg-card p-8 rounded-lg shadow-lg w-[400px]">
-        <div className="mb-8">
-          <Logo />
-        </div>
-        <h1 className="text-2xl font-semibold mb-2 text-card-foreground">Sign Up</h1>
-        <p className="text-muted-foreground mb-6">Create your account to get started</p>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-black">
+      <div className="w-full max-w-[400px] space-y-6">
+        <Logo />
+        <AuthForm 
+          title="Sign Up" 
+          description="Create your account to get started"
+          onSubmit={handleSubmit}
+        >
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm mb-2 text-card-foreground">First Name</label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 bg-secondary text-secondary-foreground border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
-                required
-                value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="block text-sm mb-2 text-card-foreground">Last Name</label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 bg-secondary text-secondary-foreground border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
-                required
-                value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm mb-2 text-card-foreground">Email</label>
-            <input
-              type="email"
-              className="w-full px-3 py-2 bg-secondary text-secondary-foreground border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
+            <AuthInput
+              id="firstName"
+              label="First Name"
+              type="text"
+              value={formData.firstName}
+              onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
               required
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              disabled={isLoading}
+            />
+            <AuthInput
+              id="lastName"
+              label="Last Name"
+              type="text"
+              value={formData.lastName}
+              onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+              required
+              disabled={isLoading}
             />
           </div>
-          <div>
-            <label className="block text-sm mb-2 text-card-foreground">Password</label>
-            <input
-              type="password"
-              className="w-full px-3 py-2 bg-secondary text-secondary-foreground border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
-              required
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            />
-          </div>
-          <div>
-            <label className="block text-sm mb-2 text-card-foreground">Confirm Password</label>
-            <input
-              type="password"
-              className="w-full px-3 py-2 bg-secondary text-secondary-foreground border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
-              required
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-            />
-          </div>
-          {error && <p className="text-destructive text-sm">{error}</p>}
-          <button
-            type="submit"
-            className="w-full bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 transition-colors"
-          >
+          <AuthInput
+            id="email"
+            label="Email"
+            type="email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            required
+            disabled={isLoading}
+          />
+          <AuthInput
+            id="password"
+            label="Password"
+            type="password"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            required
+            disabled={isLoading}
+          />
+          <AuthInput
+            id="confirmPassword"
+            label="Confirm Password"
+            type="password"
+            value={formData.confirmPassword}
+            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+            required
+            disabled={isLoading}
+          />
+          {error && <p className="text-sm text-red-500">{error}</p>}
+          <AuthButton type="submit" isLoading={isLoading}>
             Sign Up
-          </button>
-          <p className="text-center text-muted-foreground text-sm">
+          </AuthButton>
+          <div className="text-sm text-center text-neutral-400">
             Already have an account?{" "}
-            <Link href="/login" className="text-primary hover:underline">
+            <Link href="/login" className="text-[#FFD700] hover:text-[#FFD700]/90">
               Login
             </Link>
-          </p>
-        </form>
+          </div>
+        </AuthForm>
       </div>
     </main>
   )

@@ -13,9 +13,12 @@ export default function Login() {
     password: '',
   })
   const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsLoading(true)
+    setError('')
     try {
       const response = await fetch('http://localhost:3001/api/auth/login', {
         method: 'POST',
@@ -35,6 +38,8 @@ export default function Login() {
     } catch (err) {
       console.error(err)
       setError('Invalid email or password')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -54,6 +59,7 @@ export default function Login() {
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             required
+            disabled={isLoading}
           />
           <AuthInput
             id="password"
@@ -62,9 +68,12 @@ export default function Login() {
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             required
+            disabled={isLoading}
           />
           {error && <p className="text-sm text-red-500">{error}</p>}
-          <AuthButton type="submit">Login</AuthButton>
+          <AuthButton type="submit" isLoading={isLoading}>
+            Login
+          </AuthButton>
           <div className="text-sm text-center text-neutral-400">
             Don't have an account?{" "}
             <Link href="/signup" className="text-[#FFD700] hover:text-[#FFD700]/90">
