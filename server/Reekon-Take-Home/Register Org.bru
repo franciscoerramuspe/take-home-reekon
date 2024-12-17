@@ -1,0 +1,19 @@
+meta {
+  name: Register Org
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:3000/api/organizations/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "ACME Construction",
+    "subscription": "premium",
+    "maxRobots": 10
+  }
+}
