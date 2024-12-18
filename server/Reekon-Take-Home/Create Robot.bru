@@ -1,0 +1,21 @@
+meta {
+  name: Create Robot
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:3001/api/robots
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjhkYWQ0Yy0wNDIzLTQyMjctOWE0Zi1iYmYyOGEzNjRhNjQiLCJvcmdhbml6YXRpb25JZCI6IjljMTQ3YjUwLWYzNWYtNDQzZC1hZDgzLWMxMGZlZTc2NDVlYyIsImlhdCI6MTczNDUyNzcwNiwiZXhwIjoxNzM0NjE0MTA2fQ.Di-4GsbohKT7Zxin7xwk7CvIL-tx8miRtLz1E26cVQA
+}
+
+body:json {
+  {
+    "name": "Francisco Robot"
+  }
+}

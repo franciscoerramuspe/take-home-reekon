@@ -1,0 +1,22 @@
+meta {
+  name: User Login
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:3001/api/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "franciscoerramuspe91@gmail.com",
+    "password": "testing1234"
+  }
+}
+
+script:post-response {
+  bru.setVar("token", res.body.token);
+}

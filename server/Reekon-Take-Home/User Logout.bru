@@ -1,0 +1,15 @@
+meta {
+  name: User Logout
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:3001/api/auth/logout
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjhkYWQ0Yy0wNDIzLTQyMjctOWE0Zi1iYmYyOGEzNjRhNjQiLCJvcmdhbml6YXRpb25JZCI6IjljMTQ3YjUwLWYzNWYtNDQzZC1hZDgzLWMxMGZlZTc2NDVlYyIsImlhdCI6MTczNDQ2Njg4OCwiZXhwIjoxNzM0NTUzMjg4fQ.cdJVKVZRu9DJWHkrEZ1-gt88Oi9bfYk2KlNJnMP0NG4
+}
