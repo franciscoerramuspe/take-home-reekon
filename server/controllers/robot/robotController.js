@@ -138,37 +138,56 @@ export const robotController = {
       const { timeframe = '24h' } = req.query;
       const { organizationId } = req.user;
 
-      // Get completed tasks count
-      const { data: taskStats, error: taskError } = await supabase
-        .from('tasks')
-        .select('status, count(*)')
-        .eq('robot_id', robotId)
-        .eq('organization_id', organizationId)
-        .gte('created_at', new Date(Date.now() - getTimeframeMs(timeframe)).toISOString())
-        .group('status');
+      const timeAgo = new Date(Date.now() - getTimeframeMs(timeframe)).toISOString();
+
+      // Get task stats using rpc
+      const { data: tasks, error: taskError } = await supabase.rpc('get_robot_task_stats', {
+        p_robot_id: robotId,
+        p_organization_id: organizationId,
+        p_time_ago: timeAgo
+      });
 
       if (taskError) throw taskError;
 
-      // Get average battery level
-      const { data: batteryData, error: batteryError } = await supabase
+      // Get battery history - simplified query
+      const { data: batteryHistory, error: batteryError } = await supabase
         .from('robot_metrics')
-        .select('battery_level')
+        .select('battery_level, timestamp')
         .eq('robot_id', robotId)
-        .gte('timestamp', new Date(Date.now() - getTimeframeMs(timeframe)).toISOString())
-        .order('timestamp', { ascending: true });
+        .gte('timestamp', timeAgo)
+        .order('timestamp', { ascending: false });
 
       if (batteryError) throw batteryError;
 
+      // Get current robot status
+      const { data: robot, error: robotError } = await supabase
+        .from('robots')
+        .select('status, battery_level, last_active')
+        .eq('id', robotId)
+        .eq('organization_id', organizationId)
+        .single();
+
+      if (robotError) throw robotError;
+
+      // Calculate analytics
       const analytics = {
-        taskCompletion: taskStats,
-        batteryTrend: calculateBatteryTrend(batteryData),
-        uptime: calculateUptime(batteryData)
+        currentStatus: {
+          status: robot.status,
+          batteryLevel: robot.battery_level,
+          lastActive: robot.last_active
+        },
+        taskStats: tasks || [],
+        batteryTrend: calculateBatteryTrend(batteryHistory || []),
+        timeframe
       };
 
       res.json(analytics);
     } catch (error) {
       console.error('Error fetching robot analytics:', error);
-      res.status(500).json({ error: 'Failed to fetch robot analytics' });
+      res.status(500).json({ 
+        error: 'Failed to fetch robot analytics',
+        details: error.message 
+      });
     }
   },
 
@@ -196,12 +215,13 @@ function getTimeframeMs(timeframe) {
   return value * (units[unit] || units.h); // default to hours if unit not recognized
 }
 
-function calculateBatteryTrend(batteryData) {
-  if (!batteryData?.length) return null;
+function calculateBatteryTrend(batteryHistory) {
+  if (!batteryHistory.length) return null;
   
   return {
-    current: batteryData[batteryData.length - 1]?.battery_level,
-    average: batteryData.reduce((sum, reading) => sum + reading.battery_level, 0) / batteryData.length
+    current: batteryHistory[0]?.battery_level,
+    average: batteryHistory.reduce((sum, reading) => sum + reading.battery_level, 0) / batteryHistory.length,
+    samples: batteryHistory.length
   };
 }
 
