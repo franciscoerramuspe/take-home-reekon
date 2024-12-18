@@ -1,16 +1,21 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import RobotService, { Robot, robotService } from '@/services/robotService';
-import CreateRobotModal from '@/components/robots/CreateRobotModal';
+import { PlusIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
 import RobotCard from '@/components/robots/RobotCard';
+import CreateRobotModal from '@/components/robots/CreateRobotModal';
+import { robotService } from '@/services/robotService';
+import { useCustomToast } from '@/hooks/useToast';
+import type { Robot } from '@/types/robot';
 
 export default function DashboardPage() {
   const [robots, setRobots] = useState<Robot[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const router = useRouter();
+  const toast = useCustomToast();
 
   const fetchRobots = async () => {
     try {
@@ -18,7 +23,7 @@ export default function DashboardPage() {
       setRobots(data);
     } catch (err) {
       console.error('Error:', err);
-      setError('Failed to load robots');
+      toast.error('Failed to load robots');
     } finally {
       setLoading(false);
     }
@@ -33,9 +38,11 @@ export default function DashboardPage() {
       await robotService.createRobot(name);
       await fetchRobots();
       setIsCreateModalOpen(false);
+      toast.success('Robot created successfully');
     } catch (err) {
       console.error('Error creating robot:', err);
-      throw err; // This will be caught by the modal's error handling
+      toast.error('Failed to create robot');
+      throw err;
     }
   };
 
@@ -45,9 +52,10 @@ export default function DashboardPage() {
     try {
       await robotService.deleteRobot(robotId);
       await fetchRobots();
+      toast.success('Robot deleted successfully');
     } catch (err) {
       console.error('Error deleting robot:', err);
-      setError('Failed to delete robot');
+      toast.error('Failed to delete robot');
     }
   };
 
@@ -55,24 +63,17 @@ export default function DashboardPage() {
     try {
       await robotService.updateRobotStatus(robotId, status, batteryLevel);
       await fetchRobots();
+      toast.success('Robot status updated successfully');
     } catch (err) {
       console.error('Error updating robot:', err);
-      setError('Failed to update robot status');
+      toast.error('Failed to update robot status');
     }
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-white">Loading...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-red-500">{error}</div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500" />
       </div>
     );
   }
@@ -80,13 +81,14 @@ export default function DashboardPage() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-white">Robots Overview</h1>
-        <button 
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        <h1 className="text-2xl font-bold text-white">Your Robots</h1>
+        <Button 
           onClick={() => setIsCreateModalOpen(true)}
+          className="bg-blue-500 hover:bg-blue-600"
         >
+          <PlusIcon className="w-4 h-4 mr-2" />
           Add Robot
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
