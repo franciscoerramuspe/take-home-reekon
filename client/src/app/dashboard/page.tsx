@@ -1,72 +1,111 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Battery, Wifi } from 'lucide-react';
-
-interface Robot {
-  id: string;
-  serialNumber: string;
-  status: string;
-  batteryLevel: number;
-}
+import { useRouter } from 'next/navigation';
+import RobotService, { Robot, robotService } from '@/services/robotService';
+import CreateRobotModal from '@/components/robots/CreateRobotModal';
+import RobotCard from '@/components/robots/RobotCard';
 
 export default function DashboardPage() {
   const [robots, setRobots] = useState<Robot[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const router = useRouter();
+
+  const fetchRobots = async () => {
+    try {
+      const data = await robotService.getAllRobots();
+      setRobots(data);
+    } catch (err) {
+      console.error('Error:', err);
+      setError('Failed to load robots');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchRobots = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:3001/api/robots', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          setRobots(data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch robots:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchRobots();
   }, []);
 
+  const handleCreateRobot = async (name: string) => {
+    try {
+      await robotService.createRobot(name);
+      await fetchRobots();
+      setIsCreateModalOpen(false);
+    } catch (err) {
+      console.error('Error creating robot:', err);
+      throw err; // This will be caught by the modal's error handling
+    }
+  };
+
+  const handleDeleteRobot = async (robotId: string) => {
+    if (!confirm('Are you sure you want to delete this robot?')) return;
+    
+    try {
+      await robotService.deleteRobot(robotId);
+      await fetchRobots();
+    } catch (err) {
+      console.error('Error deleting robot:', err);
+      setError('Failed to delete robot');
+    }
+  };
+
+  const handleUpdateStatus = async (robotId: string, status: string, batteryLevel: number) => {
+    try {
+      await robotService.updateRobotStatus(robotId, status, batteryLevel);
+      await fetchRobots();
+    } catch (err) {
+      console.error('Error updating robot:', err);
+      setError('Failed to update robot status');
+    }
+  };
+
   if (loading) {
-    return <div className="flex justify-center items-center h-64">
-      <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-[#FFD700]"></div>
-    </div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-red-500">{error}</div>
+      </div>
+    );
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {robots.map((robot) => (
-        <div 
-          key={robot.id} 
-          className="bg-[#1A1A1A] overflow-hidden shadow-lg rounded-sm border border-neutral-800 transition-all duration-200 hover:border-[#FFD700]"
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-white">Robots Overview</h1>
+        <button 
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          onClick={() => setIsCreateModalOpen(true)}
         >
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg font-medium text-[#FFD700]">
-              Robot {robot.serialNumber}
-            </h3>
-            <div className="mt-3 space-y-2">
-              <p className="text-sm text-neutral-400 flex items-center">
-                <Wifi className="mr-2 h-4 w-4" />
-                Status: <span className="ml-1 text-white">{robot.status}</span>
-              </p>
-              <p className="text-sm text-neutral-400 flex items-center">
-                <Battery className="mr-2 h-4 w-4" />
-                Battery: <span className="ml-1 text-white">{robot.batteryLevel}%</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      ))}
+          Add Robot
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {robots.map((robot) => (
+          <RobotCard 
+            key={robot.id}
+            robot={robot}
+            onDelete={handleDeleteRobot}
+            onUpdateStatus={handleUpdateStatus}
+            onClick={() => router.push(`/dashboard/robots/${robot.id}`)}
+          />
+        ))}
+      </div>
+
+      <CreateRobotModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onCreate={handleCreateRobot}
+      />
     </div>
   );
 }

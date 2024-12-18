@@ -1,0 +1,111 @@
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+export interface Robot {
+  id: string;
+  name: string;
+  status: 'online' | 'offline' | 'maintenance';
+  battery_level: number;
+  last_active: string;
+}
+
+export interface RobotAnalytics {
+  currentStatus: {
+    status: string;
+    batteryLevel: number;
+    lastActive: string;
+  };
+  taskStats: Array<{
+    status: string;
+    count: number;
+  }>;
+  batteryTrend: {
+    current: number;
+    average: number;
+    samples: number;
+  } | null;
+}
+
+export default class RobotService {
+  private getHeaders() {
+    const token = localStorage.getItem('token');
+    return {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    };
+  }
+
+  async getAllRobots(): Promise<Robot[]> {
+    const response = await fetch(`${API_URL}/robots`, {
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch robots');
+    }
+
+    return response.json();
+  }
+
+  async createRobot(name: string): Promise<Robot> {
+    console.log('Creating robot with name:', name);
+    console.log('API URL:', `${API_URL}/robots`);
+
+    const headers = this.getHeaders();
+    console.log('Headers:', headers);
+
+    const response = await fetch(`${API_URL}/robots`, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({ name }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      console.error('Create robot error:', error);
+      throw new Error(
+        `Failed to create robot: ${error.message || response.statusText}`
+      );
+    }
+
+    return response.json();
+  }
+
+  async updateRobotStatus(
+    robotId: string,
+    status: string,
+    batteryLevel: number
+  ): Promise<Robot> {
+    const response = await fetch(`${API_URL}/robots/${robotId}/status`, {
+      method: 'PATCH',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ status, batteryLevel }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update robot status');
+    }
+
+    return response.json();
+  }
+
+  async assignTask(
+    robotId: string,
+    taskType: string,
+    parameters: Record<string, any>,
+    priority: string = 'normal'
+  ): Promise<any> {
+    const response = await fetch(`${API_URL}/robots/${robotId}/tasks`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ taskType, parameters, priority }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to assign task');
+    }
+
+    return response.json();
+  }
+}
+
+export const robotService = new RobotService();
