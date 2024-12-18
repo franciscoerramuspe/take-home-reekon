@@ -1,0 +1,22 @@
+meta {
+  name: Update Robot Location
+  type: http
+  seq: 1
+}
+
+put {
+  url: http://localhost:3001/api/robots/{{robotId}}/location
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "latitude": 40.7621,
+    "longitude": -101.5782
+  }
+}

@@ -252,6 +252,135 @@ export const robotController = {
         details: error.message 
       });
     }
+  },
+
+  async updateRobotLocation(req, res) {
+    try {
+      const { robotId } = req.params;
+      const { latitude, longitude } = req.body;
+      const { organizationId } = req.user;
+
+      // Validate coordinates
+      if (!latitude || !longitude || 
+          latitude < -90 || latitude > 90 || 
+          longitude < -180 || longitude > 180) {
+        return res.status(400).json({ error: 'Invalid coordinates' });
+      }
+
+      // Insert new location
+      const { data, error } = await supabase
+        .from('robot_locations')
+        .insert([
+          {
+            robot_id: robotId,
+            organization_id: organizationId,
+            latitude,
+            longitude
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      res.json(data);
+    } catch (error) {
+      console.error('Error updating robot location:', error);
+      res.status(500).json({ error: 'Failed to update robot location' });
+    }
+  },
+
+  async getRobotLocation(req, res) {
+    try {
+      const { robotId } = req.params;
+      const { organizationId } = req.user;
+
+      const { data, error } = await supabase
+        .from('robot_latest_locations')
+        .select('*')
+        .eq('robot_id', robotId)
+        .single();
+
+      if (error) throw error;
+      if (!data) {
+        return res.status(404).json({ error: 'Location not found' });
+      }
+
+      res.json(data);
+    } catch (error) {
+      console.error('Error fetching robot location:', error);
+      res.status(500).json({ error: 'Failed to fetch robot location' });
+    }
+  },
+
+  async getAllRobotLocations(req, res) {
+    try {
+      const { organizationId } = req.user;
+
+      // Join with robots table to get robot details along with locations
+      const { data, error } = await supabase
+        .from('robots')
+        .select(`
+          id,
+          name,
+          status,
+          battery_level,
+          robot_latest_locations (
+            latitude,
+            longitude,
+            created_at
+          )
+        `)
+        .eq('organization_id', organizationId);
+
+      if (error) throw error;
+
+      // Format the response
+      const formattedData = data.map(robot => ({
+        id: robot.id,
+        name: robot.name,
+        status: robot.status,
+        batteryLevel: robot.battery_level,
+        location: robot.robot_latest_locations?.[0] || null
+      }));
+
+      res.json(formattedData);
+    } catch (error) {
+      console.error('Error fetching robot locations:', error);
+      res.status(500).json({ error: 'Failed to fetch robot locations' });
+    }
+  },
+
+  async getLocationHistory(req, res) {
+    try {
+      const { robotId } = req.params;
+      const { organizationId } = req.user;
+      const { start, end } = req.query;
+
+      let query = supabase
+        .from('robot_locations')
+        .select('*')
+        .eq('robot_id', robotId)
+        .eq('organization_id', organizationId)
+        .order('created_at', { ascending: false });
+
+      // Add date filters if provided
+      if (start) {
+        query = query.gte('created_at', start);
+      }
+      if (end) {
+        query = query.lte('created_at', end);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      res.json(data);
+    } catch (error) {
+      console.error('Error fetching location history:', error);
+      res.status(500).json({ error: 'Failed to fetch location history' });
+    }
   }
 };
 

@@ -1,46 +1,5 @@
 meta {
-  name: Assign Robot Task
+  name: undefined
   type: http
-  seq: 4
-}
-
-post {
-  url: http://localhost:3001/api/robots/1335e26e-3b08-453e-8003-20264a3837f7/tasks
-  body: json
-  auth: bearer
-}
-
-auth:bearer {
-  token: {{token}}
-}
-
-body:json {
-  {
-    "taskType": "measurement",
-    "parameters": {
-      "location": "Room A",
-      "dimension": "length",
-      "unit": "meters"
-    },
-    "priority": "high"
-  }
-}
-
-// Try assigning a task to an offline robot
-post {
-  url: http://localhost:3001/api/robots/2e46d137-fada-4147-b132-2889549cc685/tasks
-  body: json
-  auth: bearer
-}
-
-body:json {
-  {
-    "taskType": "measurement",
-    "parameters": {
-      "location": "Room B",
-      "dimension": "width",
-      "unit": "meters"
-    },
-    "priority": "high"
-  }
+  seq: 2
 }

@@ -1,11 +1,11 @@
 meta {
   name: Update Robot Status
   type: http
-  seq: 8
+  seq: 4
 }
 
 patch {
-  url: http://localhost:3001/api/robots/1335e26e-3b08-453e-8003-20264a3837f7/status
+  url: http://localhost:3001/api/robots/YOUR_ROBOT_ID/status
   body: json
   auth: bearer
 }
@@ -16,7 +16,7 @@ auth:bearer {
 
 body:json {
   {
-    "status": "online",
-    "batteryLevel": 20
+    "status": "maintenance",
+    "batteryLevel": 75
   }
 }
