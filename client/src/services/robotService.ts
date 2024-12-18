@@ -106,6 +106,17 @@ export default class RobotService {
 
     return response.json();
   }
+
+  async deleteRobot(robotId: string): Promise<void> {
+    const response = await fetch(`${API_URL}/robots/${robotId}`, {
+      method: 'DELETE',
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete robot');
+    }
+  }
 }
 
 export const robotService = new RobotService();

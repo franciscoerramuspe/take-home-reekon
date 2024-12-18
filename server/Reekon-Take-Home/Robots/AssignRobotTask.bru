@@ -25,3 +25,22 @@ body:json {
     "priority": "high"
   }
 }
+
+// Try assigning a task to an offline robot
+post {
+  url: http://localhost:3001/api/robots/2e46d137-fada-4147-b132-2889549cc685/tasks
+  body: json
+  auth: bearer
+}
+
+body:json {
+  {
+    "taskType": "measurement",
+    "parameters": {
+      "location": "Room B",
+      "dimension": "width",
+      "unit": "meters"
+    },
+    "priority": "high"
+  }
+}

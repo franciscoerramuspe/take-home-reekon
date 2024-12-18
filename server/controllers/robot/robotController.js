@@ -201,6 +201,57 @@ export const robotController = {
     const value = parseInt(timeframe);
     const unit = timeframe.slice(-1);
     return value * (units[unit] || units.h);
+  },
+
+  async deleteRobot(req, res) {
+    try {
+      const { robotId } = req.params;
+      const { organizationId } = req.user;
+
+      console.log('Delete Request:', {
+        robotId,
+        organizationId
+      });
+
+      // First, verify the robot exists and belongs to the organization
+      const { data: robot, error: fetchError } = await supabase
+        .from('robots')
+        .select('*')
+        .eq('id', robotId)
+        .eq('organization_id', organizationId)
+        .single();
+
+      console.log('Fetch Result:', { robot, fetchError });
+
+      if (fetchError || !robot) {
+        return res.status(404).json({ 
+          error: 'Robot not found or does not belong to your organization'
+        });
+      }
+
+      // Try using RPC to delete
+      const { data, error: deleteError } = await supabase.rpc('delete_robot', {
+        robot_id: robotId,
+        org_id: organizationId
+      });
+
+      console.log('Delete RPC Result:', { data, deleteError });
+
+      if (deleteError) {
+        throw deleteError;
+      }
+
+      res.json({ 
+        message: 'Robot deleted successfully',
+        deletedRobotId: robotId
+      });
+    } catch (error) {
+      console.error('Error deleting robot:', error);
+      res.status(500).json({ 
+        error: 'Failed to delete robot',
+        details: error.message 
+      });
+    }
   }
 };
 

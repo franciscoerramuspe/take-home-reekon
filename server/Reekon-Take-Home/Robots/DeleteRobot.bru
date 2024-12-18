@@ -1,0 +1,15 @@
+meta {
+  name: Delete Robot
+  type: http
+  seq: 9
+}
+
+delete {
+  url: http://localhost:3001/api/robots/e213db76-edda-4fcb-bdde-2ffc3e999713
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
