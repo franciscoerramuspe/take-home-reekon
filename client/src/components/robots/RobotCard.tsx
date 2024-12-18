@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { EditIcon, Trash2Icon, BotIcon, BatteryIcon } from 'lucide-react'
@@ -30,17 +29,10 @@ export default function RobotCard({ robot, onDelete, onUpdateStatus, onClick }: 
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="w-full"
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-    >
+    <div className="w-full">
       <Card 
         onClick={onClick}
-        className="cursor-pointer bg-gray-800/50 hover:bg-gray-800/70 border-gray-700 transition-all duration-200"
+        className="cursor-pointer bg-gray-800/50 hover:bg-gray-800/70 border-gray-700"
       >
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
@@ -73,10 +65,10 @@ export default function RobotCard({ robot, onDelete, onUpdateStatus, onClick }: 
             </div>
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+        <CardFooter className="flex gap-2">
           <Button 
             variant="outline" 
-            className="w-full sm:w-auto flex-1 bg-blue-500/10 text-blue-400 border-blue-500/50 hover:bg-blue-500/20 hover:text-blue-300"
+            className="flex-1 bg-blue-500/10 text-blue-400 border-blue-500/50 hover:bg-blue-500/20 hover:text-blue-300"
             onClick={(e) => {
               e.stopPropagation()
               setIsEditModalOpen(true)
@@ -87,7 +79,7 @@ export default function RobotCard({ robot, onDelete, onUpdateStatus, onClick }: 
           </Button>
           <Button 
             variant="outline"
-            className="w-full sm:w-auto flex-1 bg-red-500/10 text-red-400 border-red-500/50 hover:bg-red-500/20 hover:text-red-300"
+            className="flex-1 bg-red-500/10 text-red-400 border-red-500/50 hover:bg-red-500/20 hover:text-red-300"
             onClick={handleDelete}
             disabled={isDeleting}
           >
@@ -107,7 +99,7 @@ export default function RobotCard({ robot, onDelete, onUpdateStatus, onClick }: 
         currentStatus={robot.status}
         currentBatteryLevel={robot.battery_level}
       />
-    </motion.div>
+    </div>
   )
 }
 
