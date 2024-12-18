@@ -1,7 +1,7 @@
 meta {
   name: Create Robot
   type: http
-  seq: 6
+  seq: 1
 }
 
 post {
@@ -16,6 +16,10 @@ auth:bearer {
 
 body:json {
   {
-    "name": "Francisco Robot"
+    "name": "Francisco Robot 3"
   }
+}
+
+script:post-response {
+  bru.setVar("robotId", res.body.id);
 }

@@ -1,0 +1,27 @@
+meta {
+  name: Assign Robot Task
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:3001/api/robots/{{robotId}}/tasks
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "taskType": "measurement",
+    "parameters": {
+      "location": "Room A",
+      "dimension": "length",
+      "unit": "meters"
+    },
+    "priority": "high"
+  }
+}

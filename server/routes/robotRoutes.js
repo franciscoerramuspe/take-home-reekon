@@ -6,5 +6,8 @@ const router = express.Router();
 
 router.post('/', authenticateToken, robotController.createRobot);
 router.get('/', authenticateToken, robotController.getRobots);
+router.patch('/:robotId/status', authenticateToken, robotController.updateRobotStatus);
+router.post('/:robotId/tasks', authenticateToken, robotController.assignTask);
+router.get('/:robotId/analytics', authenticateToken, robotController.getRobotAnalytics);
 
 export default router; 

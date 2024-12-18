@@ -1,0 +1,19 @@
+meta {
+  name: Get Robot Analytics
+  type: http
+  seq: 5
+}
+
+get {
+  url: http://localhost:3001/api/robots/daff3ab4-0492-476b-9605-d66eb09d6e93/analytics?timeframe=24h
+  body: none
+  auth: bearer
+}
+
+params:query {
+  timeframe: 24h
+}
+
+auth:bearer {
+  token: {{token}}
+}
