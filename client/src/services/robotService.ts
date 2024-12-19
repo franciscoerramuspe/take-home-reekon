@@ -3,9 +3,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export interface Robot {
   id: string;
   name: string;
+  organization_id: string;
   status: 'online' | 'offline' | 'maintenance';
   battery_level: number;
   last_active: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface RobotAnalytics {

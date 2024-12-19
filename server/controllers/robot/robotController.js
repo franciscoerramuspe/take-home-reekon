@@ -20,11 +20,7 @@ export const robotController = {
         .select()
         .single();
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
-
+      if (error) throw error;
       res.status(201).json(robot);
     } catch (error) {
       console.error('Error creating robot:', error);
@@ -57,29 +53,55 @@ export const robotController = {
       const { status, batteryLevel } = req.body;
       const { organizationId } = req.user;
 
-      // Start a Supabase transaction
-      const { data, error } = await supabase.rpc('update_robot_status', {
-        p_robot_id: robotId,
-        p_organization_id: organizationId,
-        p_status: status,
-        p_battery_level: batteryLevel
-      });
+      console.log('Starting update for:', { robotId, status, batteryLevel });
 
-      if (error) throw error;
-
-      // Get the updated robot
-      const { data: updatedRobot, error: fetchError } = await supabase
+      // First verify the robot exists
+      const { data: robot, error: fetchError } = await supabase
         .from('robots')
         .select('*')
         .eq('id', robotId)
         .eq('organization_id', organizationId)
         .single();
 
-      if (fetchError) throw fetchError;
+      if (fetchError || !robot) {
+        console.error('Robot not found:', fetchError);
+        return res.status(404).json({ error: 'Robot not found' });
+      }
 
+      // Do the update without select
+      const { error: updateError } = await supabase
+        .from('robots')
+        .update({
+          status: status,
+          battery_level: batteryLevel,
+          updated_at: new Date().toISOString(),
+          last_active: new Date().toISOString()
+        })
+        .eq('id', robotId)
+        .eq('organization_id', organizationId);
+
+      if (updateError) {
+        console.error('Update error:', updateError);
+        return res.status(400).json({ error: 'Failed to update robot status' });
+      }
+
+      // Fetch the updated robot separately
+      const { data: updatedRobot, error: fetchUpdatedError } = await supabase
+        .from('robots')
+        .select('*')
+        .eq('id', robotId)
+        .eq('organization_id', organizationId)
+        .single();
+
+      if (fetchUpdatedError) {
+        console.error('Error fetching updated robot:', fetchUpdatedError);
+        return res.status(400).json({ error: 'Failed to fetch updated robot' });
+      }
+
+      console.log('Successfully updated robot:', updatedRobot);
       res.json(updatedRobot);
     } catch (error) {
-      console.error('Error updating robot status:', error);
+      console.error('Error in updateRobotStatus:', error);
       res.status(500).json({ error: 'Failed to update robot status' });
     }
   },
@@ -258,22 +280,12 @@ export const robotController = {
     try {
       const { robotId } = req.params;
       const { latitude, longitude } = req.body;
-      const { organizationId } = req.user;
 
-      // Validate coordinates
-      if (!latitude || !longitude || 
-          latitude < -90 || latitude > 90 || 
-          longitude < -180 || longitude > 180) {
-        return res.status(400).json({ error: 'Invalid coordinates' });
-      }
-
-      // Insert new location
       const { data, error } = await supabase
         .from('robot_locations')
         .insert([
           {
             robot_id: robotId,
-            organization_id: organizationId,
             latitude,
             longitude
           }
@@ -282,7 +294,6 @@ export const robotController = {
         .single();
 
       if (error) throw error;
-
       res.json(data);
     } catch (error) {
       console.error('Error updating robot location:', error);
@@ -317,31 +328,30 @@ export const robotController = {
     try {
       const { organizationId } = req.user;
 
-      // Join with robots table to get robot details along with locations
-      const { data, error } = await supabase
+      const { data: robots, error } = await supabase
         .from('robots')
         .select(`
           id,
           name,
           status,
           battery_level,
-          robot_latest_locations (
+          robot_locations (
             latitude,
             longitude,
             created_at
           )
         `)
-        .eq('organization_id', organizationId);
+        .eq('organization_id', organizationId)
+        .order('created_at', { foreignTable: 'robot_locations', ascending: false });
 
       if (error) throw error;
 
-      // Format the response
-      const formattedData = data.map(robot => ({
+      const formattedData = robots.map(robot => ({
         id: robot.id,
         name: robot.name,
         status: robot.status,
         batteryLevel: robot.battery_level,
-        location: robot.robot_latest_locations?.[0] || null
+        location: robot.robot_locations[0] || null
       }));
 
       res.json(formattedData);

@@ -5,7 +5,7 @@ meta {
 }
 
 patch {
-  url: http://localhost:3001/api/robots/YOUR_ROBOT_ID/status
+  url: http://localhost:3001/api/robots/{{robotId}}/status
   body: json
   auth: bearer
 }
