@@ -1,0 +1,15 @@
+meta {
+  name: Get Errors
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:3001/api/errors/analytics
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
