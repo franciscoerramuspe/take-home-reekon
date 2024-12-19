@@ -1,7 +1,13 @@
 export interface RobotError {
   id: string;
   robot_id: string;
-  error_type: 'crash' | 'system_error' | 'connection_loss' | 'hardware_failure';
+  robot_name?: string;
+  error_type:
+    | 'software'
+    | 'hardware'
+    | 'connectivity'
+    | 'operational'
+    | 'system_error';
   description: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   created_at: string;
