@@ -10,6 +10,7 @@ import { robotService } from '@/services/robotService';
 import { useCustomToast } from '@/hooks/useToast';
 import type { Robot } from '@/types/robot';
 import { ErrorBoundary } from '@/components/error-boundary';
+import { useWebSocket } from '@/contexts/WebSocketContext';
 
 export default function DashboardPage() {
   const [robots, setRobots] = useState<Robot[]>([]);
@@ -17,6 +18,7 @@ export default function DashboardPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const router = useRouter();
   const toast = useCustomToast();
+  const { socket } = useWebSocket();
 
   const fetchRobots = async () => {
     try {
@@ -46,6 +48,57 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchRobots();
   }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    // Battery updates
+    socket.on('robot:battery_update', ({ robotId, batteryLevel }) => {
+      setRobots(prevRobots => 
+        prevRobots.map(robot => 
+          robot.id === robotId 
+            ? { ...robot, battery_level: batteryLevel }
+            : robot
+        )
+      );
+    });
+
+    // Status updates
+    socket.on('robot:status_update', ({ robotId, status }) => {
+      setRobots(prevRobots => 
+        prevRobots.map(robot => 
+          robot.id === robotId 
+            ? { ...robot, status }
+            : robot
+        )
+      );
+    });
+
+    // Location updates
+    socket.on('robot:location_update', ({ robotId, latitude, longitude }) => {
+      setRobots(prevRobots => 
+        prevRobots.map(robot => 
+          robot.id === robotId 
+            ? { 
+                ...robot, 
+                location: { 
+                  ...robot.location, 
+                  latitude, 
+                  longitude,
+                  created_at: new Date().toISOString()
+                } 
+              }
+            : robot
+        )
+      );
+    });
+
+    return () => {
+      socket.off('robot:battery_update');
+      socket.off('robot:status_update');
+      socket.off('robot:location_update');
+    };
+  }, [socket]);
 
   const handleCreateRobot = async (name: string) => {
     try {

@@ -1,4 +1,4 @@
-import { useToast } from '@/components/ui/use-toast'
+import { useToast } from './use-toast'
 import { CheckCircle, XCircle } from 'lucide-react'
 
 export function useCustomToast() {

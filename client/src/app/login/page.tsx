@@ -43,6 +43,15 @@ export default function Login() {
     }
   }
 
+  const handleLoginSuccess = async (token: string) => {
+    localStorage.setItem('token', token);
+    
+    // Trigger storage event manually since it doesn't fire for same-page changes
+    window.dispatchEvent(new Event('storage'));
+    
+    // Rest of your login success handling...
+  };
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-black">
       <div className="w-full max-w-[400px] space-y-6">
