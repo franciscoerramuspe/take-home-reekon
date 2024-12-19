@@ -1,4 +1,6 @@
 import supabase from '../../db/supabase.js';
+import { websocketController } from '../websocket/websocketController.js';
+import { io } from '../../app.js';
 
 export const robotController = {
   async createRobot(req, res) {
@@ -23,6 +25,11 @@ export const robotController = {
       if (error) {
         console.error('Supabase error:', error);
         throw error;
+      }
+
+      // Start battery drain if robot is created as online
+      if (robot.status === 'online') {
+        await websocketController.startBatteryDrain(robot.id, organizationId, io);
       }
 
       res.status(201).json(robot);
@@ -57,27 +64,29 @@ export const robotController = {
       const { status, batteryLevel } = req.body;
       const { organizationId } = req.user;
 
-      // Start a Supabase transaction
-      const { data, error } = await supabase.rpc('update_robot_status', {
-        p_robot_id: robotId,
-        p_organization_id: organizationId,
-        p_status: status,
-        p_battery_level: batteryLevel
-      });
+      console.log('Attempting to update robot:', { robotId, status, batteryLevel });
 
-      if (error) throw error;
-
-      // Get the updated robot
-      const { data: updatedRobot, error: fetchError } = await supabase
+      // Update robot in database
+      const { error: updateError } = await supabase
         .from('robots')
-        .select('*')
+        .update({
+          status,
+          battery_level: Math.floor(batteryLevel),
+          last_active: new Date().toISOString()
+        })
         .eq('id', robotId)
-        .eq('organization_id', organizationId)
-        .single();
+        .eq('organization_id', organizationId);
 
-      if (fetchError) throw fetchError;
+      if (updateError) {
+        console.error('Update error:', updateError);
+        return res.status(400).json({ error: 'Failed to update robot status' });
+      }
 
-      res.json(updatedRobot);
+      // Emit updates
+      websocketController.emitStatusUpdate(io, organizationId, robotId, status);
+      websocketController.emitBatteryUpdate(io, organizationId, robotId, Math.floor(batteryLevel));
+
+      res.json({ status, batteryLevel: Math.floor(batteryLevel) });
     } catch (error) {
       console.error('Error updating robot status:', error);
       res.status(500).json({ error: 'Failed to update robot status' });
@@ -282,6 +291,8 @@ export const robotController = {
         .single();
 
       if (error) throw error;
+
+      websocketController.emitLocationUpdate(io, organizationId, robotId, latitude, longitude);
 
       res.json(data);
     } catch (error) {

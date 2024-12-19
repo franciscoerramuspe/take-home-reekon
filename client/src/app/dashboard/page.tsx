@@ -65,6 +65,7 @@ export default function DashboardPage() {
 
     // Status updates
     socket.on('robot:status_update', ({ robotId, status }) => {
+      console.log('Received status update:', { robotId, status });
       setRobots(prevRobots => 
         prevRobots.map(robot => 
           robot.id === robotId 
@@ -129,7 +130,6 @@ export default function DashboardPage() {
   const handleUpdateStatus = async (robotId: string, status: string, batteryLevel: number) => {
     try {
       await robotService.updateRobotStatus(robotId, status, batteryLevel);
-      await fetchRobots();
       toast.success('Robot status updated successfully');
     } catch (err) {
       console.error('Error updating robot:', err);
