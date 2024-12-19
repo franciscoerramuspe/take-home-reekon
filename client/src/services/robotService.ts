@@ -117,6 +117,34 @@ export default class RobotService {
       throw new Error('Failed to delete robot');
     }
   }
+
+  async updateRobotLocation(
+    robotId: string,
+    latitude: number,
+    longitude: number
+  ): Promise<void> {
+    const response = await fetch(`${API_URL}/robots/${robotId}/location`, {
+      method: 'PUT',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ latitude, longitude }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update robot location');
+    }
+  }
+
+  async getRobotLocations(): Promise<Robot[]> {
+    const response = await fetch(`${API_URL}/robots/locations`, {
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch robot locations');
+    }
+
+    return response.json();
+  }
 }
 
 export const robotService = new RobotService();

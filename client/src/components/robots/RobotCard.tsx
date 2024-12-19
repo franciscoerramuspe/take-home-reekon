@@ -15,6 +15,7 @@ interface RobotCardProps {
 }
 
 export default function RobotCard({ robot, onDelete, onUpdateStatus, onClick }: RobotCardProps) {
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 

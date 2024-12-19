@@ -2,13 +2,14 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { PlusIcon } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import RobotCard from '@/components/robots/RobotCard';
 import CreateRobotModal from '@/components/robots/CreateRobotModal';
+import RobotMap from '@/components/maps/RobotMap';
 import { robotService } from '@/services/robotService';
 import { useCustomToast } from '@/hooks/useToast';
 import type { Robot } from '@/types/robot';
+import { ErrorBoundary } from '@/components/error-boundary';
 
 export default function DashboardPage() {
   const [robots, setRobots] = useState<Robot[]>([]);
@@ -19,8 +20,21 @@ export default function DashboardPage() {
 
   const fetchRobots = async () => {
     try {
-      const data = await robotService.getAllRobots();
-      setRobots(data);
+      const [robotsData, locationsData] = await Promise.all([
+        robotService.getAllRobots(),
+        robotService.getRobotLocations()
+      ]);
+
+      // Merge location data with robot data
+      const robotsWithLocations = robotsData.map(robot => {
+        const locationData = locationsData.find(loc => loc.id === robot.id);
+        return {
+          ...robot,
+          location: locationData?.location
+        };
+      });
+
+      setRobots(robotsWithLocations);
     } catch (err) {
       console.error('Error:', err);
       toast.error('Failed to load robots');
@@ -79,36 +93,39 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-white">Your Robots</h1>
-        <Button 
-          onClick={() => setIsCreateModalOpen(true)}
-          className="bg-blue-500 hover:bg-blue-600"
-        >
-          <PlusIcon className="w-4 h-4 mr-2" />
-          Add Robot
-        </Button>
-      </div>
+    <ErrorBoundary>
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-white">Your Robots</h1>
+          <Button onClick={() => setIsCreateModalOpen(true)}>
+            <PlusIcon className="w-4 h-4 mr-2" />
+            Add Robot
+          </Button>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {robots.map((robot) => (
-          <RobotCard 
-            key={robot.id}
-            robot={robot}
-            onDelete={handleDeleteRobot}
-            onUpdateStatus={handleUpdateStatus}
-            onClick={() => router.push(`/dashboard/robots/${robot.id}`)}
-          />
-        ))}
-      </div>
+        <div className="mb-6 bg-gray-800 rounded-lg p-4">
+          <RobotMap robots={robots.filter(robot => robot.location)} />
+        </div>
 
-      <CreateRobotModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onCreate={handleCreateRobot}
-      />
-    </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {robots.map((robot) => (
+            <RobotCard 
+              key={robot.id}
+              robot={robot}
+              onDelete={handleDeleteRobot}
+              onUpdateStatus={handleUpdateStatus}
+              onClick={() => router.push(`/dashboard/robots/${robot.id}`)}
+            />
+          ))}
+        </div>
+
+        <CreateRobotModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onCreate={handleCreateRobot}
+        />
+      </div>
+    </ErrorBoundary>
   );
 }
 
