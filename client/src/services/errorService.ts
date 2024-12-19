@@ -53,6 +53,18 @@ export class ErrorService {
 
     return response.json();
   }
+
+  async listErrors(): Promise<RobotError[]> {
+    const response = await fetch(`${API_URL}/errors`, {
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch error logs');
+    }
+
+    return response.json();
+  }
 }
 
 export const errorService = new ErrorService();
