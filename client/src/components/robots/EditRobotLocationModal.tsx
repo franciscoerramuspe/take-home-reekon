@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { MapPin, Loader2, Search } from 'lucide-react'
+import { useState } from 'react'
+import { MapPin, Loader2 } from 'lucide-react'
 import Map, { Marker } from 'react-map-gl'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -16,7 +16,7 @@ interface EditRobotLocationModalProps {
   isOpen: boolean
   onClose: () => void
   onUpdate: (latitude: number, longitude: number) => Promise<void>
-  currentLocation?: { latitude: number; longitude: number }
+  currentLocation: { latitude: number; longitude: number; } | null | undefined
 }
 
 export default function EditRobotLocationModal({ 

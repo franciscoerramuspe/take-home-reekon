@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { BotIcon as RobotIcon, Loader2, MapPin, Search } from 'lucide-react'
+import { BotIcon as RobotIcon, Loader2, MapPin } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
