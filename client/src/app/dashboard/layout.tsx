@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Logo } from "@/components/logo";
-import { LogOut, BarChart2, Briefcase, BarChart3, AlertCircle, Menu } from 'lucide-react';
+import { LogOut, BarChart2, Briefcase, BarChart3, AlertCircle, Menu, Home } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -68,15 +68,14 @@ export default function DashboardLayout({
               <div className="flex items-center gap-8">
                 <Link 
                   href="/dashboard"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-3"
                 >
                   <Logo />
-                  <span className={cn(
-                    "text-base font-semibold",
+                  <Home className={cn(
+                    "h-5 w-5",
                     pathname === '/dashboard' ? "text-[#FFD700]" : "text-white"
-                  )}>
-                    Dashboard
-                  </span>
+                  )} />
+                  Home
                 </Link>
 
                 {/* Desktop Navigation */}
