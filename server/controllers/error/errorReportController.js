@@ -10,16 +10,33 @@ const formatDuration = (ms) => {
 class ErrorReportController {
   async listErrors(req, res) {
     try {
+      const { organizationId } = req.user;
       const { data: errors, error } = await supabase
         .from('robot_errors')
-        .select('*')
-        .eq('organization_id', req.user.organizationId)
+        .select(`
+          *,
+          robots:robot_id (
+            name
+          )
+        `)
+        .eq('organization_id', organizationId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      res.json(errors);
+
+      // Transform the response to include robot_name
+      const transformedErrors = errors.map(error => ({
+        ...error,
+        robot_name: error.robots?.name
+      }));
+
+      res.json(transformedErrors);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      console.error('Error fetching error logs:', error);
+      res.status(500).json({ 
+        error: 'Failed to fetch error logs',
+        details: error.message 
+      });
     }
   }
 
