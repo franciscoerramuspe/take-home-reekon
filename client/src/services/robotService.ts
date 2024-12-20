@@ -94,9 +94,9 @@ export default class RobotService {
   async assignTask(
     robotId: string,
     taskType: string,
-    parameters: Record<string, any>,
-    priority: string = 'normal'
-  ): Promise<any> {
+    parameters: Record<string, unknown>,
+    priority: 'low' | 'normal' | 'high' = 'normal'
+  ): Promise<{ id: string; status: string }> {
     const response = await fetch(`${API_URL}/robots/${robotId}/tasks`, {
       method: 'POST',
       headers: this.getHeaders(),
@@ -146,6 +146,49 @@ export default class RobotService {
       throw new Error('Failed to fetch robot locations');
     }
 
+    return response.json();
+  }
+
+  async listRobots() {
+    const response = await fetch(`${API_URL}/robots`, {
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch robots');
+    }
+
+    return response.json();
+  }
+
+  async getRobotErrors(robotId: string) {
+    const response = await fetch(`${API_URL}/robots/${robotId}/errors`, {
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch robot errors');
+    }
+
+    return response.json();
+  }
+
+  async getRobotJobs(robotId: string) {
+    const response = await fetch(`${API_URL}/robots/${robotId}/jobs`, {
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch robot jobs');
+    }
+
+    return response.json();
+  }
+
+  async getRobotDetails(robotId: string) {
+    const response = await fetch(`${API_URL}/robots/${robotId}`, {
+      headers: this.getHeaders(),
+    });
     return response.json();
   }
 }

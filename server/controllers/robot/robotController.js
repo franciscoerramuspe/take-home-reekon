@@ -391,6 +391,102 @@ export const robotController = {
       console.error('Error fetching location history:', error);
       res.status(500).json({ error: 'Failed to fetch location history' });
     }
+  },
+
+  async getRobotErrors(req, res) {
+    try {
+      const { robotId } = req.params;
+      const { organizationId } = req.user;
+
+      const { data: errors, error } = await supabase
+        .from('robot_errors')
+        .select('*')
+        .eq('robot_id', robotId)
+        .eq('organization_id', organizationId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      res.json(errors);
+    } catch (error) {
+      console.error('Error fetching robot errors:', error);
+      res.status(500).json({ 
+        error: 'Failed to fetch robot errors',
+        details: error.message 
+      });
+    }
+  },
+
+  async getRobotJobs(req, res) {
+    try {
+      const { robotId } = req.params;
+      const { organizationId } = req.user;
+
+      const { data: jobs, error } = await supabase
+        .from('jobs')
+        .select('*')
+        .eq('robot_id', robotId)
+        .eq('organization_id', organizationId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      res.json(jobs);
+    } catch (error) {
+      console.error('Error fetching robot jobs:', error);
+      res.status(500).json({ 
+        error: 'Failed to fetch robot jobs',
+        details: error.message 
+      });
+    }
+  },
+
+  async getRobotDetails(req, res) {
+    try {
+      const { robotId } = req.params;
+      const { organizationId } = req.user;
+
+      const { data: robot, error } = await supabase
+        .from('robots')
+        .select('*')
+        .eq('id', robotId)
+        .eq('organization_id', organizationId)
+        .single();
+
+      if (error) throw error;
+
+      res.json(robot);
+    } catch (error) {
+      console.error('Error fetching robot details:', error);
+      res.status(500).json({ 
+        error: 'Failed to fetch robot details',
+        details: error.message 
+      });
+    }
+  },
+
+  async getRobotErrors(req, res) {
+    try {
+      const { robotId } = req.params;
+      const { organizationId } = req.user;
+
+      const { data: errors, error } = await supabase
+        .from('robot_errors')
+        .select('*')
+        .eq('robot_id', robotId)
+        .eq('organization_id', organizationId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      res.json(errors);
+    } catch (error) {
+      console.error('Error fetching robot errors:', error);
+      res.status(500).json({ 
+        error: 'Failed to fetch robot errors',
+        details: error.message 
+      });
+    }
   }
 };
 

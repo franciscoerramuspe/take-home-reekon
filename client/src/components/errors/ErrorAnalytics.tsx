@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from "recharts"
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts"
 import { AlertTriangle, Activity, TrendingUp, Zap, Clock, AlertCircle } from 'lucide-react'
 import { ErrorAnalytics } from "@/types/robotErrors"
 

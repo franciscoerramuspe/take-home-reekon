@@ -27,10 +27,14 @@ export default function CreateRobotModal({ isOpen, onClose, onCreate }: CreateRo
       await onCreate(name.trim())
       setName('')
       onClose()
-    } catch (error: any) {
+    } catch (error: Error | unknown) {
       // Error handling is done by the parent component
       console.error('Error in modal:', error)
-      toast.error('Failed to create robot')
+      toast({
+        title: 'Failed to create robot',
+        description: error instanceof Error ? error.message : 'An unknown error occurred',
+        variant: 'destructive',
+      })
     } finally {
       setLoading(false)
     }

@@ -7,9 +7,9 @@ import { ErrorAnalytics } from '@/types/robotErrors'
 import { useCustomToast } from '@/hooks/useCustomToast'
 
 export default function ErrorsPage() {
-  const [analytics, setAnalytics] = useState<ErrorAnalytics | null>(null)
-  const [loading, setLoading] = useState(true)
-  const toast = useCustomToast()
+  const [analytics, setAnalytics] = useState<ErrorAnalytics | null>(null);
+  const [loading, setLoading] = useState(true);
+  const toast = useCustomToast();
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -25,7 +25,7 @@ export default function ErrorsPage() {
     }
 
     fetchAnalytics()
-  }, [])
+  })
 
   if (loading) {
     return (
