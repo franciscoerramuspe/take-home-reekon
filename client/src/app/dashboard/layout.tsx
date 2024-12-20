@@ -33,7 +33,7 @@ export default function DashboardLayout({
     <Link
       href={href}
       className={cn(
-        "flex items-center gap-2 px-3 py-1.5 text-sm transition-colors",
+        "flex items-center gap-3 px-3 py-1.5 text-sm transition-colors",
         pathname === href 
           ? "text-[#FFD700] font-medium" 
           : "text-neutral-400 hover:text-neutral-200"

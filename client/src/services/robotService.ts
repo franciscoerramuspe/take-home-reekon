@@ -49,7 +49,10 @@ export default class RobotService {
     return response.json();
   }
 
-  async createRobot(name: string): Promise<Robot> {
+  async createRobot(
+    name: string,
+    location: { latitude: number; longitude: number }
+  ): Promise<Robot> {
     console.log('Creating robot with name:', name);
     console.log('API URL:', `${API_URL}/robots`);
 
@@ -59,7 +62,12 @@ export default class RobotService {
     const response = await fetch(`${API_URL}/robots`, {
       method: 'POST',
       headers: headers,
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({
+        name,
+        location,
+        status: 'offline', // Set initial status
+        battery_level: 100, // Set initial battery level
+      }),
     });
 
     if (!response.ok) {
@@ -70,7 +78,18 @@ export default class RobotService {
       );
     }
 
-    return response.json();
+    const robot = await response.json();
+
+    // Create initial location for the robot
+    await fetch(`${API_URL}/robots/${robot.id}/location`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(location),
+    });
+
+    return robot;
   }
 
   async updateRobotStatus(
@@ -146,7 +165,16 @@ export default class RobotService {
       throw new Error('Failed to fetch robot locations');
     }
 
-    return response.json();
+    const data = await response.json();
+    return data.map((robot: any) => ({
+      ...robot,
+      location: robot.location
+        ? {
+            latitude: robot.location.latitude,
+            longitude: robot.location.longitude,
+          }
+        : null,
+    }));
   }
 
   async listRobots() {
@@ -189,6 +217,22 @@ export default class RobotService {
     const response = await fetch(`${API_URL}/robots/${robotId}`, {
       headers: this.getHeaders(),
     });
+    return response.json();
+  }
+
+  async getRobotLocation(robotId: string) {
+    const response = await fetch(`${API_URL}/robots/${robotId}/location`, {
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok && response.status !== 404) {
+      throw new Error('Failed to fetch robot location');
+    }
+
+    if (response.status === 404) {
+      return null;
+    }
+
     return response.json();
   }
 }

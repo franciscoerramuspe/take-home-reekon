@@ -304,20 +304,23 @@ export const robotController = {
   async getRobotLocation(req, res) {
     try {
       const { robotId } = req.params;
-      const { organizationId } = req.user;
 
       const { data, error } = await supabase
-        .from('robot_latest_locations')
+        .from('robot_locations')
         .select('*')
         .eq('robot_id', robotId)
-        .single();
+        .order('created_at', { ascending: false })
+        .limit(1);
 
       if (error) throw error;
-      if (!data) {
-        return res.status(404).json({ error: 'Location not found' });
+      
+      // If no location found, return success with null location
+      if (!data || data.length === 0) {
+        return res.json({ location: []});
       }
 
-      res.json(data);
+      // Return the first (most recent) location
+      res.json(data[0]);
     } catch (error) {
       console.error('Error fetching robot location:', error);
       res.status(500).json({ error: 'Failed to fetch robot location' });
