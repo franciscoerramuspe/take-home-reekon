@@ -16,6 +16,11 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.get('/api/hello', (req, res) => {
+  res.json({ message: 'Hello World from Robot Control Backend!' });
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/organizations', organizationRoutes);
 app.use('/api/robots', robotRoutes);
