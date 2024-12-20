@@ -49,7 +49,10 @@ export default class RobotService {
     return response.json();
   }
 
-  async createRobot(name: string): Promise<Robot> {
+  async createRobot(
+    name: string,
+    location: { latitude: number; longitude: number }
+  ): Promise<Robot> {
     console.log('Creating robot with name:', name);
     console.log('API URL:', `${API_URL}/robots`);
 
@@ -59,7 +62,12 @@ export default class RobotService {
     const response = await fetch(`${API_URL}/robots`, {
       method: 'POST',
       headers: headers,
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({
+        name,
+        location,
+        status: 'offline', // Set initial status
+        battery_level: 100, // Set initial battery level
+      }),
     });
 
     if (!response.ok) {
@@ -70,7 +78,18 @@ export default class RobotService {
       );
     }
 
-    return response.json();
+    const robot = await response.json();
+
+    // Create initial location for the robot
+    await fetch(`${API_URL}/robots/${robot.id}/location`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(location),
+    });
+
+    return robot;
   }
 
   async updateRobotStatus(
@@ -94,9 +113,9 @@ export default class RobotService {
   async assignTask(
     robotId: string,
     taskType: string,
-    parameters: Record<string, any>,
-    priority: string = 'normal'
-  ): Promise<any> {
+    parameters: Record<string, unknown>,
+    priority: 'low' | 'normal' | 'high' = 'normal'
+  ): Promise<{ id: string; status: string }> {
     const response = await fetch(`${API_URL}/robots/${robotId}/tasks`, {
       method: 'POST',
       headers: this.getHeaders(),
@@ -144,6 +163,74 @@ export default class RobotService {
 
     if (!response.ok) {
       throw new Error('Failed to fetch robot locations');
+    }
+
+    const data = await response.json();
+    return data.map((robot: any) => ({
+      ...robot,
+      location: robot.location
+        ? {
+            latitude: robot.location.latitude,
+            longitude: robot.location.longitude,
+          }
+        : null,
+    }));
+  }
+
+  async listRobots() {
+    const response = await fetch(`${API_URL}/robots`, {
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch robots');
+    }
+
+    return response.json();
+  }
+
+  async getRobotErrors(robotId: string) {
+    const response = await fetch(`${API_URL}/robots/${robotId}/errors`, {
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch robot errors');
+    }
+
+    return response.json();
+  }
+
+  async getRobotJobs(robotId: string) {
+    const response = await fetch(`${API_URL}/robots/${robotId}/jobs`, {
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch robot jobs');
+    }
+
+    return response.json();
+  }
+
+  async getRobotDetails(robotId: string) {
+    const response = await fetch(`${API_URL}/robots/${robotId}`, {
+      headers: this.getHeaders(),
+    });
+    return response.json();
+  }
+
+  async getRobotLocation(robotId: string) {
+    const response = await fetch(`${API_URL}/robots/${robotId}/location`, {
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok && response.status !== 404) {
+      throw new Error('Failed to fetch robot location');
+    }
+
+    if (response.status === 404) {
+      return null;
     }
 
     return response.json();

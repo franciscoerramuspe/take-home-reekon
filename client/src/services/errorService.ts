@@ -1,5 +1,26 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+export interface RobotError {
+  id: string;
+  robot_id: string;
+  error_type: string;
+  description: string;
+  severity: string;
+  created_at: string;
+  resolved_at: string | null;
+}
+
+export interface ErrorAnalytics {
+  total: number;
+  resolved: number;
+  by_severity: {
+    high: number;
+    medium: number;
+    low: number;
+  };
+  by_type: Record<string, number>;
+}
+
 export class ErrorService {
   private getHeaders() {
     const token = localStorage.getItem('token');
@@ -54,13 +75,13 @@ export class ErrorService {
     return response.json();
   }
 
-  async listErrors(): Promise<RobotError[]> {
-    const response = await fetch(`${API_URL}/errors`, {
+  async getRobotErrors(robotId: string) {
+    const response = await fetch(`${API_URL}/robots/${robotId}/errors`, {
       headers: this.getHeaders(),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch error logs');
+      throw new Error('Failed to fetch robot errors');
     }
 
     return response.json();
