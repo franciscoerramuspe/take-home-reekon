@@ -14,8 +14,5 @@ router.put('/:robotId/location', authenticateToken, robotController.updateRobotL
 router.get('/:robotId/location', authenticateToken, robotController.getRobotLocation);
 router.get('/locations', authenticateToken, robotController.getAllRobotLocations);
 router.get('/:robotId/location/history', authenticateToken, robotController.getLocationHistory);
-router.get('/:robotId', authenticateToken, robotController.getRobotDetails);
-router.get('/:robotId/errors', authenticateToken, robotController.getRobotErrors);
-router.get('/:robotId/jobs', authenticateToken, robotController.getRobotJobs);
 
 export default router; 

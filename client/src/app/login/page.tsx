@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Logo } from "@/components/logo"
-import { AuthForm, AuthInput, AuthButton } from "@/components/auth-form"
+import { AuthForm, AuthInput, AuthButton, AuthLink } from "@/components/auth-form"
 
 export default function Login() {
   const router = useRouter()
@@ -75,7 +75,7 @@ export default function Login() {
             Login
           </AuthButton>
           <div className="text-sm text-center text-neutral-400">
-            Don&apos;t have an account?{" "}
+            Don't have an account?{" "}
             <Link href="/signup" className="text-[#FFD700] hover:text-[#FFD700]/90">
               Sign up
             </Link>
