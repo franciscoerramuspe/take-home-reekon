@@ -304,23 +304,20 @@ export const robotController = {
   async getRobotLocation(req, res) {
     try {
       const { robotId } = req.params;
+      const { organizationId } = req.user;
 
       const { data, error } = await supabase
-        .from('robot_locations')
+        .from('robot_latest_locations')
         .select('*')
         .eq('robot_id', robotId)
-        .order('created_at', { ascending: false })
-        .limit(1);
+        .single();
 
       if (error) throw error;
-      
-      // If no location found, return success with null location
-      if (!data || data.length === 0) {
-        return res.json({ location: []});
+      if (!data) {
+        return res.status(404).json({ error: 'Location not found' });
       }
 
-      // Return the first (most recent) location
-      res.json(data[0]);
+      res.json(data);
     } catch (error) {
       console.error('Error fetching robot location:', error);
       res.status(500).json({ error: 'Failed to fetch robot location' });
@@ -393,102 +390,6 @@ export const robotController = {
     } catch (error) {
       console.error('Error fetching location history:', error);
       res.status(500).json({ error: 'Failed to fetch location history' });
-    }
-  },
-
-  async getRobotErrors(req, res) {
-    try {
-      const { robotId } = req.params;
-      const { organizationId } = req.user;
-
-      const { data: errors, error } = await supabase
-        .from('robot_errors')
-        .select('*')
-        .eq('robot_id', robotId)
-        .eq('organization_id', organizationId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      res.json(errors);
-    } catch (error) {
-      console.error('Error fetching robot errors:', error);
-      res.status(500).json({ 
-        error: 'Failed to fetch robot errors',
-        details: error.message 
-      });
-    }
-  },
-
-  async getRobotJobs(req, res) {
-    try {
-      const { robotId } = req.params;
-      const { organizationId } = req.user;
-
-      const { data: jobs, error } = await supabase
-        .from('jobs')
-        .select('*')
-        .eq('robot_id', robotId)
-        .eq('organization_id', organizationId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      res.json(jobs);
-    } catch (error) {
-      console.error('Error fetching robot jobs:', error);
-      res.status(500).json({ 
-        error: 'Failed to fetch robot jobs',
-        details: error.message 
-      });
-    }
-  },
-
-  async getRobotDetails(req, res) {
-    try {
-      const { robotId } = req.params;
-      const { organizationId } = req.user;
-
-      const { data: robot, error } = await supabase
-        .from('robots')
-        .select('*')
-        .eq('id', robotId)
-        .eq('organization_id', organizationId)
-        .single();
-
-      if (error) throw error;
-
-      res.json(robot);
-    } catch (error) {
-      console.error('Error fetching robot details:', error);
-      res.status(500).json({ 
-        error: 'Failed to fetch robot details',
-        details: error.message 
-      });
-    }
-  },
-
-  async getRobotErrors(req, res) {
-    try {
-      const { robotId } = req.params;
-      const { organizationId } = req.user;
-
-      const { data: errors, error } = await supabase
-        .from('robot_errors')
-        .select('*')
-        .eq('robot_id', robotId)
-        .eq('organization_id', organizationId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      res.json(errors);
-    } catch (error) {
-      console.error('Error fetching robot errors:', error);
-      res.status(500).json({ 
-        error: 'Failed to fetch robot errors',
-        details: error.message 
-      });
     }
   }
 };
