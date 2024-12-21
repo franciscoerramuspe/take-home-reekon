@@ -31,7 +31,7 @@ export default function RobotMap({ robots }: RobotMapProps) {
       initialViewState={{
         longitude: -71.0589,
         latitude: 42.3601,
-        zoom: 12
+        zoom: 11
       }}
       style={{ width: '100%', height: 500 }}
       mapStyle="mapbox://styles/mapbox/dark-v11"

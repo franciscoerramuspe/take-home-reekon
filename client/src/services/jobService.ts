@@ -1,6 +1,6 @@
 import { Job } from '@/types/jobs';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = 'https://take-home-reekon.vercel.app/api';
 
 class JobService {
   private getHeaders() {

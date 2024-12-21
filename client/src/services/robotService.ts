@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_DEPLOY_URL;
+const API_URL = 'https://take-home-reekon.vercel.app/api';
 
 export interface Robot {
   id: string;
@@ -38,9 +38,12 @@ export default class RobotService {
   }
 
   async getAllRobots(): Promise<Robot[]> {
-    const response = await fetch(`${API_URL}/robots`, {
-      headers: this.getHeaders(),
-    });
+    const response = await fetch(
+      `https://take-home-reekon.vercel.app/api/robots`,
+      {
+        headers: this.getHeaders(),
+      }
+    );
 
     if (!response.ok) {
       throw new Error('Failed to fetch robots');
@@ -157,9 +160,12 @@ export default class RobotService {
   }
 
   async getRobotLocations(): Promise<Robot[]> {
-    const response = await fetch(`${API_URL}/robots/locations`, {
-      headers: this.getHeaders(),
-    });
+    const response = await fetch(
+      `https://take-home-reekon.vercel.app/api/robots/locations`,
+      {
+        headers: this.getHeaders(),
+      }
+    );
 
     if (!response.ok) {
       throw new Error('Failed to fetch robot locations');

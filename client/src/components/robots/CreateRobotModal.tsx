@@ -28,9 +28,9 @@ export default function CreateRobotModal({ isOpen, onClose, onCreate }: CreateRo
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null)
   const [viewport, setViewport] = useState({
-    latitude: 0,
-    longitude: 0,
-    zoom: 1,
+    latitude: 42.3601,
+    longitude: -71.0589,
+    zoom: 11,
     bearing: 0,
     pitch: 0
   })
