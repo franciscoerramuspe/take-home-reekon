@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { toast } from '@/hooks/use-toast'
 import Map, { Marker } from 'react-map-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
 
 interface Suggestion {
   place_name: string

@@ -9,4 +9,5 @@ module.exports = {
     experimental: {
       forceSwcTransforms: true,
     },
+    transpilePackages: ['mapbox-gl']
   }
