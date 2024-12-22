@@ -1,4 +1,4 @@
-const API_URL = 'https://take-home-reekon.vercel.app/api';
+const API_URL = process.env.NEXT_DEPLOY_URL;
 
 export interface Robot {
   id: string;

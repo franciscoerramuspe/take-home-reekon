@@ -4,7 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Logo } from "@/components/logo"
-import { AuthForm, AuthInput, AuthButton, AuthLink } from "@/components/auth-form"
+import { AuthForm, AuthInput, AuthButton } from "@/components/auth-form"
+
+const API_URL = process.env.NEXT_DEPLOY_URL;
 
 export default function SignUp() {
   const router = useRouter()
@@ -31,7 +33,7 @@ export default function SignUp() {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_DEPLOY_URL}/auth/register`, {
+      const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -89,9 +89,16 @@ class AuthController {
       // Remove password from response
       delete user.password;
 
+      const token = jwt.sign(
+        { userId: user.id, organizationId: user.organizationId },
+        process.env.JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+
       res.status(201).json({
         message: 'User registered successfully',
-        user
+        user,
+        token
       });
     } catch (error) {
       console.error('Registration error:', error);
