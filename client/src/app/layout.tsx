@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
-import "../../public/globals.css";
+import "./globals.css";
 import { ToastProvider } from "@/providers/ToastProvider"
 
 const geistSans = GeistSans
