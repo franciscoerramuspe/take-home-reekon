@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# REEKON Robot Management Platform - Server
+
+Backend server for the REEKON Robot Management Platform, providing API endpoints and business logic for robot management and monitoring.
+
+## Features
+
+- **Authentication & Authorization**
+  - JWT-based authentication
+  - Role-based access control
+  - Organization-level permissions
+  - Session management
+
+- **Robot Management API**
+  - Robot CRUD operations
+  - Real-time status updates
+  - Location tracking
+  - Battery monitoring
+  - Error logging and management
+
+- **Job Management API**
+  - Job creation and assignment
+  - Status tracking
+  - Progress monitoring
+  - Historical data and analytics
+
+- **WebSocket Integration**
+  - Real-time robot status updates
+  - Live location tracking
+  - Instant error notifications
+  - Job status changes
+
+- **Data Management**
+  - Robot telemetry storage
+  - Job history
+  - Error logs
+  - Analytics data
+
+## Tech Stack
+
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Database**: PostgreSQL
+- **Authentication**: JWT/Supabase
+
 
 ## Getting Started
 
-First, run the development server:
+1. **Important Note**
+   The server must be running before starting the client application, as the client depends on the server's API endpoints and WebSocket connections.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+2. **Prerequisites**
+   - Node.js 18.17 or later
+   - PostgreSQL 14 or later
+   - npm or yarn package manager
+
+3. **Installation**
+   ```bash
+   # Clone the repository
+   git clone https://github.com/franciscoerramuspe/take-home-reekon.git
+
+   # Navigate to server directory
+   cd take-home-reekon/server
+
+   # Install dependencies
+   npm install
+   ```
+
+4. **Environment Setup**
+   - Contact Francisco Erramuspe to obtain the required `.env` file
+   - The `.env` file contains sensitive configuration including:
+     - Database credentials
+     - JWT secrets
+     - API configuration
+   
+
+5. **Running the Server**
+   ```bash
+   # Development mode
+   npm run dev
+
+   ```
+
+## Project Structure
+
+```
+server/
+├── src/
+│   ├── controllers/    # Route controllers
+│   ├── models/         # Database models
+│   ├── routes/         # API routes
+│   ├── services/       # Business logic
+│   ├── middleware/     # Custom middleware
+│   ├── utils/          # Helper functions
+│   └── app.ts          # App entry point
+├── prisma/
+│   └── schema.prisma   # Database schema
+├── tests/              # Test files
+└── package.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Contributing
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## License
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the MIT License - see the LICENSE file for details
