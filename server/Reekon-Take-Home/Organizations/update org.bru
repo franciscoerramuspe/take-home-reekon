@@ -1,0 +1,23 @@
+meta {
+  name: update org
+  type: http
+  seq: 2
+}
+
+put {
+  url: http://localhost:3001/api/organizations/5c008b48-2445-4a16-918c-3a9c7a575531
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+        "name": "Updated Organization Name",
+        "subscription": "premium",
+        "maxRobots": 10
+      }
+}

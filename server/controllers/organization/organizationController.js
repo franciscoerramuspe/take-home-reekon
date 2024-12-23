@@ -57,6 +57,38 @@ class OrganizationController {
       });
     }
   }
+
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const updates = {};
+      
+      if (req.body.name !== undefined) updates.name = req.body.name;
+      if (req.body.max_robots !== undefined) updates.max_robots = req.body.max_robots;
+      if (req.body.subscription !== undefined) updates.subscription = req.body.subscription;
+      // Include this so that the settings field is updated
+      if (req.body.settings !== undefined) updates.settings = req.body.settings;
+  
+      const { data, error } = await supabase
+        .from('organizations')
+        .update(updates)
+        .eq('id', id)
+        .select();
+  
+      if (error) throw error;
+  
+      if (!data || data.length === 0) {
+        return res.status(404).json({ error: 'Organization not found' });
+      }
+  
+      res.json(data[0]);
+    } catch (error) {
+      console.error('Update organization error:', error);
+      res.status(500).json({
+        error: error.message || 'Internal server error'
+      });
+    }
+  }
 }
 
 export default new OrganizationController(); 
