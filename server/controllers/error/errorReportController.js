@@ -1,6 +1,6 @@
 import supabase from '../../db/supabase.js';
 
-// Move the helper function outside the class
+
 const formatDuration = (ms) => {
   const hours = Math.floor(ms / (1000 * 60 * 60));
   const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
