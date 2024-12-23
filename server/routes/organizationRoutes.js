@@ -1,7 +1,9 @@
 import express from 'express';
-import OrganizationController from '../controllers/organization/organizationController.js';
+import organizationController from '../controllers/organization/organizationController.js';
+
 const router = express.Router();
 
-router.post('/register', OrganizationController.register.bind(OrganizationController));
+router.post('/register', organizationController.register);
+router.get('/', organizationController.list);
 
 export default router; 

@@ -40,6 +40,23 @@ class OrganizationController {
       });
     }
   }
+
+  async list(req, res) {
+    try {
+      const { data, error } = await supabase
+        .from('organizations')
+        .select('*');
+
+      if (error) throw error;
+
+      res.json(data);
+    } catch (error) {
+      console.error('List organizations error:', error);
+      res.status(500).json({
+        error: error.message || 'Internal server error'
+      });
+    }
+  }
 }
 
 export default new OrganizationController(); 
